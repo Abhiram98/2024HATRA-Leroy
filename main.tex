@@ -187,13 +187,19 @@ To evaluate \toolname, we test its compression abilities over a corpora of open 
 % Again minus results, but including a direction and motivation
 
 %-------------------------------------------------------------------------------
-\section{Motivation}
+\section{Background and Motivation}
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+\subsection{Background}
+%-------------------------------------------------------------------------------
+DreamCoder~\cite{ellis2020dreamcoder} is a State-of-the-art program synthesizer where the agent ( the synthesizer) is given a corpus of programs to learn from, but instead of synthesizing code directly, the agent first abstracts a library of repeated functionalities over the given corpus thus compressing the corpus. This reduces the agent's error probabilities by reducing the size of the code the agent has to write, as it can call the abstracted functions instead of rewriting them whenever needed. Hence, to speed-up program synthesis, one could speed up library abstraction. Stitch~\cite{Bowers_2023stitch} is a State-of-The-Art library abstraction tool that takes in a list of programs written in a lisp-like syntax and outputs a library (a list of abstracted functions) while also re-writing the input programs to utilize the abstracted functions. It does so by performing a top-down search over the programs syntax tree to find repeated sub-trees. A common sub-tree starts with a common node. When the leaves of the sub-tree get included as a potential abstraction, the abstraction gets larger, but its uses across all programs reduce, so the utility of an abstraction is defined as a function of the size of the abstraction and the number of uses, where larger functions that are used more frequently have a higher utility. Stitch speeds up the abstraction process by computing the utility of found common sub-trees, and eliminating search paths that are guaranteed to have a lower utility than the current optimal one thus reducing the search space. This method is called a corpus-guided top-down search (CTS). 
+
+%-------------------------------------------------------------------------------
+\subsection{Motivation} % maybe rename. 
 %-------------------------------------------------------------------------------
 
-Stitch~\cite{Bowers_2023stitch} is a State-of-The-Art library abstraction tool that takes in a list of programs written in a lisp-like syntax and outputs a library (a list of abstracted functions) while also re-writing the input programs to utilize the abstracted functions. Stitch uses a Lisp-like syntax because it is designed to operate on Domain Specific Languages (DSLs). Hence, while it works with any simple program that can be written in a lisp-like lambda syntax, it does not generalise well to more complicated programs written in general purpose languages, like python.
-
 % \todo{Add some sentences about why it is interesting to lift stitch to python. Something about how developers would find it useful to have such a tool.}
-
+Stitch uses CTS based on utility instead of correctness, which works on the lisp-like programs expected by stitch, but does not generalise well to more complicated programs written in general purpose languages, like python. 
 For example, when Stitch is given a python's abstract Syntax Tree (AST) represented in a lisp style, 
 % (tweaked to have a lisp-like lambda format) 
 some elements or expressions, like the keywords "while" and "if", or operators like "==" and ">", can be treated as first-class citizens of the programming language. This means that variables could hold such values, or functions could be called with these elements as parameters.
