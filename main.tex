@@ -106,7 +106,7 @@
 \date{}
 
 % make title bold and 14 pt font (Latex default is non-bold, 16 pt)
-\title{\Large \bf Library Extraction for Imperative Programming Languages}
+\title{\Large \bf Leroy: Library Extraction for Imperative Programming Languages}
 
 %for single author (just remove % characters)
 \author{
@@ -192,7 +192,7 @@ To evaluate \toolname, we test its compression abilities over a corpora of open 
 %-------------------------------------------------------------------------------
 \subsection{Background}
 %-------------------------------------------------------------------------------
-DreamCoder~\cite{ellis2020dreamcoder} is a State-of-the-art program synthesizer where the agent ( the synthesizer) is given a corpus of programs to learn from, but instead of synthesizing code directly, the agent first abstracts a library of repeated functionalities over the given corpus thus compressing the corpus. This reduces the agent's error probabilities by reducing the size of the code the agent has to write, as it can call the abstracted functions instead of rewriting them whenever needed. Hence, to speed-up program synthesis, one could speed up library abstraction. Stitch~\cite{Bowers_2023stitch} is a State-of-The-Art library abstraction tool that takes in a list of programs written in a lisp-like syntax and outputs a library (a list of abstracted functions) while also re-writing the input programs to utilize the abstracted functions. It does so by performing a top-down search over the programs syntax tree to find repeated sub-trees. A common sub-tree starts with a common node. When the leaves of the sub-tree get included as a potential abstraction, the abstraction gets larger, but its uses across all programs reduce, so the utility of an abstraction is defined as a function of the size of the abstraction and the number of uses, where larger functions that are used more frequently have a higher utility. Stitch speeds up the abstraction process by computing the utility of found common sub-trees, and eliminating search paths that are guaranteed to have a lower utility than the current optimal one thus reducing the search space. This method is called a corpus-guided top-down search (CTS). 
+DreamCoder~\cite{ellis2020dreamcoder} is a State-of-the-art program synthesizer where the agent ( the synthesizer) is given a corpus of programs to learn from. Instead of synthesizing code directly, the agent first abstracts a library of repeated functionalities over the given corpus thus compressing the corpus. This reduces the agent's error probabilities by reducing the size of the code the agent has to write, as it can use the abstracted functions instead of rewriting them whenever needed. Hence, to speed-up program synthesis, one could speed up library abstraction. Library extraction involves identifying and extracting the repeated functionalities from a corpus, which is facilitated by analyzing the Abstract Syntax Trees (ASTs) of the programs. ASTs provide a structured representation of the code, allowing algorithms to identify common patterns or sub-trees that can be abstracted into reusable functions. Stitch~\cite{Bowers_2023stitch} is a State-of-The-Art library abstraction tool that takes in a list of programs written in a lisp-like syntax and outputs a library (a list of abstracted functions) while also re-writing the input programs to utilize the abstracted functions. It does so by performing a corpus-guided top-down search (CTS) over the programs' Abstract Syntax Trees (ASTs) to find the optimal repeated sub-trees. ASTs provide a structured representation of the code, allowing algorithms to identify common patterns or sub-trees that can be abstracted into reusable functions. Consider a corpus of programs where multiple programs contain a similar sequence of operations to compute the factorial of a number. The library extraction process would identify this common pattern in the ASTs of these programs and abstract it into a reusable function \texttt{compute\_factorial(n)}. Stitch speeds up the library abstraction process by doing a utility-based CTS where it computes the utility of found common sub-trees, and prune the search space to eliminate search paths that are guaranteed to have a lower utility than the current optimal one. The abstraction utility is calculated based on the size of the abstracted sub-tree and its useage frequency. Meaning abstracting complex functionalities that are more frequently used in the given corpus is prioritized over abstracting smaller ones or ones not frequently used. 
 
 %-------------------------------------------------------------------------------
 \subsection{Motivation} % maybe rename. 
@@ -206,7 +206,7 @@ some elements or expressions, like the keywords "while" and "if", or operators l
 % either variable names or function names depending the lamlispfying implementation.
 This is because Stitch is unaware of the programming language it is abstracting over. So, it has no knowledge of what would be a valid abstraction in a language like Python. 
 % This can result in incorrect abstractions, like an abstraction that expects "if" or "while" as arguments and treats them as variables. Hence, 
-To better generalize Stitch and extend it to a language like Python, we identify and prune such invalid abstractions. \toolname extends Stitch by resolving the follwoing four main issues that arise when naivly passing a lisp-like python AST to Stitch: 
+To better generalize Stitch and extend it to a language like Python, we identify and prune such invalid abstractions. \toolname extends Stitch by resolving the following four main issues that arise when naively passing a lisp-like python AST to Stitch: 
 
 \begin{enumerate}
     \item Trivial Abstractions
@@ -222,60 +222,98 @@ To better generalize Stitch and extend it to a language like Python, we identify
     \toolname also resolves this reconstructing the AST and checking its validity. 
     \item Incomplete return set:
     Because Stitch treats abstractions as macros, it does not consider variable scoping in abstractions, which impacts code correctness in a language like python. For example, Stitch can abstract assignments without returning the assignment targets. That is, it can suggest functions that change the value of a variable, but never returns the changed variable. In python, such assignment will create a new variable local to the abstracted (called) function instead of changing the value of the variable from the calling function. This, although syntactically correct, changes the program behaviour. This is more advanced issue that is yet to be optimally addressed. Howbeit, \toolname approaches it but attaching a return statement to the abstracted function. \toolname returns the last computed value in the abstraction.
-    
+    \item \todo{ADD newly addressed issues  + non addressed ones (?) }
 \end{enumerate}
 
 % it can be augmented with a python-lisp compiler and a decompiler. The compiler would transform the inputted python programs to the lisp-like format that is passed to Stitch. \toolname then decompiles the output of Stitch back to python. 
 
-%-------------------------------------------------------------------------------
-\section{Design }
-%-------------------------------------------------------------------------------
-% a concrete proposal for how you intend to complete the project
+% %-------------------------------------------------------------------------------
+% \section{Design }
+% %-------------------------------------------------------------------------------
+% % a concrete proposal for how you intend to complete the project
 
 
-\begin{figure*}
-  \includegraphics[width=\textwidth]{images/Design.pdf}
-  \caption{\toolname's high level design}
-  \label{fig:design}
-\end{figure*}
-\toolname performs library extraction by operating on the AST of the programming language. \toolname uses Stitch \cite{Bowers_2023stitch} as the library extraction engine, prunes invalid abstractions produced by it to present the most useful suggestions to the developer. Figure \ref{fig:design} shows the high level design of \toolname.
-% In the sections below, we describe each step in detail.
+% \begin{figure*}
+%   \includegraphics[width=\textwidth]{images/Design.pdf}
+%   \caption{\toolname's high level design}
+%   \label{fig:design}
+% \end{figure*}
+% \toolname performs library extraction by operating on the AST of the programming language. \toolname uses Stitch \cite{Bowers_2023stitch} as the library extraction engine, prunes invalid abstractions produced by it to present the most useful suggestions to the developer. Figure \ref{fig:design} shows the high level design of \toolname.
+% % In the sections below, we describe each step in detail.
 
-\subsection{Representing Program AST in a lisp-like form}
-To convert program \textbf{ASTs to Lisp}, we treat ASTs as a series of nested function calls, with nodes as the function and subsequent child nodes as the argument of the function. This enables us to unwrap the AST into one long function call.
-% \todo{Add diagram of AST and converted lisp?}
+% \subsection{Representing Program AST in a lisp-like form}
+% To convert program \textbf{ASTs to Lisp}, we treat ASTs as a series of nested function calls, with nodes as the function and subsequent child nodes as the argument of the function. This enables us to unwrap the AST into one long function call.
+% % \todo{Add diagram of AST and converted lisp?}
 
-\subsection{Pruning Invalid Abstractions}
-Stitch suggests abstractions which involve language expressions/statements as function parameters. To \textbf{enhance abstractions} from stitch, we prune such cases. 
-
-
-\subsubsection{Macro-Like Abstractions}
-To prune macro-like abstractions, we attempt to convert the abstraction back into a program AST, and check if the tree is well-formed (all required children of a parent exist). Any incomplete ASTs are deemed to be macro-like and are pruned.
-
-\subsubsection{Invalid Parameters}
-We use a similar approach to find cases where invalid parameters could be passed to the abstraction. We convert the abstraction's body into a program AST and encode the abstraction's parameters as identifier nodes. 
-Then, we check if these identifier nodes are valid children in the AST. For example, an identifier node cannot be a valid child of a comparison expression's operator. But, an identifier node can be a valid child of the same expression's operand. 
-
-To summarise, if the AST is invalid or not well-formed, we deem the abstraction to be invalid.
-
-\subsection{Presenting Non-trivial Abstractions}
-
-To prune trivial abstractions (e.g. a function which performing addition of two arguments), we introduce a minimum size for the abstraction. This ensures that we have interesting abstractions coming out of \toolname.
+% \subsection{Pruning Invalid Abstractions}
+% Stitch suggests abstractions which involve language expressions/statements as function parameters. To \textbf{enhance abstractions} from stitch, we prune such cases. 
 
 
-\subsection{Figuring out the return value}
+% \subsubsection{Macro-Like Abstractions}
+% To prune macro-like abstractions, we attempt to convert the abstraction back into a program AST, and check if the tree is well-formed (all required children of a parent exist). Any incomplete ASTs are deemed to be macro-like and are pruned.
 
-We augment the abstraction from Stitch by adding a necessary return value, if it does not exist. Our approach returns the last variable or expression in the abstraction's body. This is a simple approach that ensures that abstractions are functional in the target programming language. 
+% \subsubsection{Invalid Parameters}
+% We use a similar approach to find cases where invalid parameters could be passed to the abstraction. We convert the abstraction's body into a program AST and encode the abstraction's parameters as identifier nodes. 
+% Then, we check if these identifier nodes are valid children in the AST. For example, an identifier node cannot be a valid child of a comparison expression's operator. But, an identifier node can be a valid child of the same expression's operand. 
 
-% We remove abstractions which take language expressions/statements as parameters. 
+% To summarise, if the AST is invalid or not well-formed, we deem the abstraction to be invalid.
 
-% \todo{This is the research problem. Add details when we have a more concrete solution.}
+% \subsection{Presenting Non-trivial Abstractions}
 
-% \subsection{Converting Lisp to Language AST}
-\subsection{Converting abstractions back to the PL}
-Finally, we convert the suggestions from stitch back into the AST. Then, we unparse the AST to result in the compressed code. 
+% To prune trivial abstractions (e.g. a function which performing addition of two arguments), we introduce a minimum size for the abstraction. This ensures that we have interesting abstractions coming out of \toolname.
+
+
+% \subsection{Figuring out the return value}
+
+% We augment the abstraction from Stitch by adding a necessary return value, if it does not exist. Our approach returns the last variable or expression in the abstraction's body. This is a simple approach that ensures that abstractions are functional in the target programming language. 
+
+% % We remove abstractions which take language expressions/statements as parameters. 
+
+% % \todo{This is the research problem. Add details when we have a more concrete solution.}
+
+% % \subsection{Converting Lisp to Language AST}
+% \subsection{Converting abstractions back to the PL}
+% Finally, we convert the suggestions from stitch back into the AST. Then, we unparse the AST to result in the compressed code. 
 
 % \todo{add design diagram.}
+
+\section{Design}
+
+\todo{Replace fig1 with a more detailed figure}
+
+\toolname performs library extraction by operating on the Abstract Syntax Tree (AST) of a subset of Python. It compiles a python AST into a lisp-like syntax that adheres to Stitch's grammar, then utilizes Stitch \cite{Bowers_2023stitch} as the library extraction engine, \toolname prunes invalid abstractions produced by Stitch to present the most useful suggestions to the developer, and compiles the output back to a python AST. Figure \ref{fig:design} illustrates the high-level design of \toolname.
+
+\subsection{Grammar}
+
+\toolname operates on a subset of python3 named $L_{func}$ as described in Essentials of Compilation: An Incremental Approach in Python by Jeremy G. Siek ~\cite{pythonbook}. $L_{func}$ consists of integer and boolean values and variables, addition and subtraction, boolean operations, comparators, conditionals and ternaries, while loops, and function calls and definitions. Figure 
+
+\todo{ include figure 8.1 for Lfunc grammar ? }
+
+
+\subsection{Compilation}
+To facilitate library extraction, \toolname converts program ASTs into a Lisp-like representation. This conversion treats AST nodes as nested function calls, where each node acts as a function and its child nodes as arguments. This approach enables \toolname to unfold the AST into a single, unified function call, simplifying the abstraction process. For instance, consider an AST representing a function call `add(a, b)`. In Lisp-like form, this would appear as `(add a b)`. After utilizing Stitch, \toolname converts the lisp-like syntax to a python AST which can then be unparsed to correct python code. 
+
+\subsection{Pruning Invalid Abstractions}
+Stitch suggests abstractions that may include language expressions or statements as function parameters. To refine these abstractions, \toolname employs pruning strategies.
+To identify and prune macro-like abstractions where the abstraction is an incomplete python code, \toolname attempts to reconstruct the abstraction into a program AST form, then checks for the correctness of the yielded AST. It verifies the completeness of the AST by ensuring all required child nodes of a parent node exist. Incomplete ASTs, indicative of macro-like structures, are subsequently pruned. For example, an incomplete AST might involve a function call without required arguments, such as `(add a)` where `b` is missing. 
+
+\subsubsection{Invalid Parameters}
+
+Additionally, \toolname identifies cases where abstractions incorporate invalid parameters. It analyzes the abstraction’s body by converting it back into a program AST and encoding parameters as identifier nodes. By validating these nodes against the AST structure, \toolname ensures the legitimacy of parameter usage within the abstraction. For instance, in a comparison expression `(a > b)`, Stitch may produce an abstraction of the form \texttt{compare(a, comparator, b)} instead of \texttt{greater\_than(a,b)}. Such abstractions that take in invalid parameters are pruned out. 
+
+\subsubsection{Presenting Non-trivial Abstractions}
+
+To enhance the utility of suggested abstractions, \toolname filters out trivial cases by imposing a minimum size requirement. This criterion ensures that the extracted abstractions are sufficiently complex and meaningful to warrant inclusion. This ensure that trivial functions, like simple addition or printing, are not abstracted alone despite having a high utility due to its high usage frequency. 
+
+\subsubsection{Determining the Return Value}
+
+\toolname complements the abstractions generated by Stitch by ensuring a coherent return value, if absent. This involves identifying and incorporating the last variable or expression in the abstraction’s body as the return value. Such an approach ensures functional correctness of the abstractions in the target programming language. For example, Stitch may produce an abstraction where a variable is updated, but does not returns the variable at the end of the abstraction, thus generating erroroneous compressed code. 
+
+\subsubsection{Liveness Analysis/Scoped Abstraction}
+\todo{elaborate on the new parts}
+% \subsection{Converting Abstractions back to the Programming Language AST}
+
+% Finally, \toolname converts the refined suggestions from Stitch back into the Abstract Syntax Tree of the programming language. It then unparses the AST to yield the compressed code, integrating the identified abstractions seamlessly into the original program structure.
 
 
 
