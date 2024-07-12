@@ -1,4 +1,21 @@
+\section{Evaluation}
+\label{sec:eval}
+
+
+We developed \toolname with Stitch commit number \todo{6fa2...} and we evaluate it on a \todo{xyz} machine running a \todo{xyz} operating system version \todo{xyz}. To evaluate it, we used a corpus of \todo{50} python programs \todo{maybe cite a github link to P2 test cases} that adhere to the P2 grammar described in figure \ref{fig:grammar}. The testing corpus can be found on \todo{github link)} along with \toolname's code. 
+
+Applying Stitch, with no pruning or validation, on lispified input yields \todo{15} total abstracions. Out of which \todo{5} of the \todo{15} found abstractions were trivial, \todo{3} involved macro-like statements, \todo{5} took in invalid parameters and only \todo{2} were valid abstractions. In comparison, applying \toolname to the same input, with the minimum size threshold set to \todo{20} outputs 6 valid abstractions, some of which create and return functions. We found that each abstraction was applied with \todo{3} call sites on average. We compressed the code by \todo{X}.
+
+\todo{what are the other parameters passed in the testing process?}
+
 \todo{rename to methodology? include limitations here? }
-\todo{Stitch commit number}
-\todo{Python3 subset }
+% This shows the necessity of our techniques. 
+
+% \toolname is able to find 6 abstractions, after applying our techniques. We used a minimum threshold size of \todo{20} \todo{size unit} to ensure larger sized abstractions. Notably, \toolname was also able to find abstractions that created and returned a function. 
+
+
+
+
+
 \todo{machine ?}
+\todo{Discuss the impact of our pruning methods on utility }

@@ -1,0 +1,21 @@
+\begin{abstract}
+% Library abstraction is the task of learning a library of repetitive or common code functionalities from a given program or set of programs. This compresses code by replacing blocks of code with their appropriate function calls. Library abstraction is also used in program-learning, where an agent learns to write a program from a given corpus of other programs. 
+
+Library learning is the process of building a library of common functionalities from a given set of programs. Typically, this process is applied in the context of aiding program synthesis: concise functions can help the synthesizer produce modularized code that is smaller in size. With AI tools being better at synthesizing programs in general purpose languages than in domain specific ones, most program synthesis work focus on Domain Specific languages (DSLs). Consequently, most library extraction tools
+% like Stitch \cite{Bowers_2023stitch}, 
+% This compresses code by replacing blocks of code with their appropriate function calls. 
+% Library abstraction is also used in program-learning, where an agent learns to write a program from a given corpus of other programs. 
+are designed to abstract over simple DSLs written in a lisp-like syntax that often have repetitive behaviour. 
+
+Our work introduces \toolname, which extends existing library learning techniques to higher level programming imperative languages, with the goal of facilitating reusability and ease of maintenance. \toolname wraps the existing Stitch framework for library learning, and converts imperative programs
+into a lisp-like format using the AST.  Our solution uses
+Stitch to do a top-down, corpus guided extraction of repetitive expressions. Further, we prune abstractions which cannot be implemented in the programming language and convert the best abstractions back to the original language. 
+We implement our technique in a tool for 
+% \todo{a subset of} 
+a subset of the Python programming language, and evaluate it on multiple corpora of programs. \todo{\toolname has an average compression ratio of \avgcompression. Additionally, we show that our technique prunes 
+% \todo{75\%} of 
+invalid abstractions.}
+
+% while checking for semantic equivalence(\todo{90\%}), compression(\todo{150\%}) and usefulness of abstractions (\todo{80\%}).
+% This paper introduces \toolname, an extension to Stitch that converts python input to a lisp-like format accepted by the Stitch, then converts the Stitch's output back to python. 
+\end{abstract}

@@ -1,0 +1,33 @@
+\section{Introduction}
+\label{intro}
+Software engineers spend a large portion of their time improving the quality of their code. This includes refactoring, improving readability, fixing formatting issues and adding documentation. In particular, engineers often refactor their code bases by abstracting reusable/repeated functionality from their code into library functions. These library functions (also called utility functions) capture parts of the program logic that are used by different software modules. 
+Library extraction can be a tedious and error-prone process for developers if done manually. 
+
+In prior work, Babble~\cite{Cao_2023babble} and Stitch~\cite{Bowers_2023stitch} leverage ideas from DreamCoder~\cite{ellis2020dreamcoder} to extract common functionality from code for library synthesis. However, these extraction tools are aimed at aiding the learning process of program synthesizers. When a program synthesizer learns from a compressed corpus, it is expected to learn to write smaller code that utilizes the abstracted libraries. This reduction of the synthesized output size reduces the possibility of errors. Prior work extracts functions over Domain Specific Languages (DSLs) that use a functional lisp-like syntax, with a focus on generating abstractions that provide the highest compression rate possible.
+
+However, ideas from these techniques are unexplored for general purpose programming languages, where developers would also like to extract common functionality for reusability and maintenance purposes. Particularly, reusability describes how well an extracted function can be reused throughout a given program corpus. Once a programmer has a good abstraction, they can simply reuse it in the future if they wish to elaborate their code. This extraction also affects maintenance in that a well-abstracted function can make the corpus more modularized, thus making it easier for programmers to maintain their code as fixing errors in the common functions propagate the changes of functionality through the entire corpus. 
+
+In this work, we introduce \toolname, a technique that extends library extraction to general purpose programming languages by wrapping the the state-of-the-art Stitch~\cite{Bowers_2023stitch} library extraction tool. Our work targets a formal subset of Python, named \ptwo{}, as our chosen language.  \ptwo{} was designed as an exemplar language for teaching compiler classes~\cite{pythonbook}, and covers much of Python's functionality, including control, functions, and scoped variables. 
+
+To leverage Stitch, \toolname first converts the original \ptwo{} program into its AST (abstract syntax tree), then
+uses the AST to generate a lisp-like program representation
+acceptable to Stitch.  Stitch then generates candidate
+functions for extraction; however, many of these candidates
+may be illegal once converted back to Python.  Invalid abstractions could be macro-like, could take invalid parameters, fail to return necessary variables, access variables out of scope, or simply be too small. We describe these issues in detail in Section~\ref{sec:design}. 
+
+% By wrapping existing library extraction techniques, \toolname provides useful and reusable functions that developers can take advantage of. We discover two approaches to present the best abstractions to a user. One, we prune invalid abstractions that are impossible to implement, by checking if each abstraction is a valid and well-formed part of the program's AST. We augment each abstraction with an appropriate return statement.
+% % \todo{Then, we augment abstractions with the results of a liveness analysis to ensure sensible values are returned.}.
+% Two, to present the most interesting abstractions to a user, \toolname adds a minimum threshold on the size of the abstraction \todo{measured in xyz} to weed out trivial abstractions. 
+
+To evaluate \toolname, we test its compression abilities over a corpus of \todo{xxx} test programs from our university's compiler class. Additionally, we count the number of invalid abstractions removed by our technique and discuss the types of abstractions found by the tool.
+
+Our paper proceeds as follows.  We first discuss background on library synthesis in Section~\ref{sec:background}.  We then introduce our design of \toolname{} in Section~\ref{sec:design}, and evaluate in Section~\ref{sec:eval}.  We review related work in Section~\ref{sec:relwork}, and conclude with a discussion
+of future work in Section~\ref{sec:conc}.
+
+% correctness of abstractions along with the compression using a subset of the 150k Python Dataset ~\cite{py150} as further explained in the evaluation section. 
+% The rest of the paper is written as follows:
+% section blah describes blah
+% section blah2 describes blah2
+
+
+% Again minus results, but including a direction and motivation

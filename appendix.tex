@@ -1,0 +1,48 @@
+\FloatBarrier
+\section{Appendix: \ptwo{} Grammar} 
+\label{sec:grammar}
+\toolname operates on a subset of Python 3 named \ptwo{} as described in A Problem Course in Compilation: From Python to x86 Assembly~\cite{pythonbook}. \ptwo{} consists of integer and boolean values and variables, addition and subtraction, boolean operations, comparators, conditionals and ternaries, while loops, and function calls and definitions. The grammar of \ptwo{} is given in Figure~\ref{fig:grammar}.
+
+\begin{figure}
+\label{fig:grammar}
+\begin{lstlisting}
+program ::= module
+module ::= statement+
+statement ::= simple_statement | compound_stmt
+simple_statement ::= "print" "(" expression ")"
+                   | target "=" expression
+                   | expression
+                   | "return" expression
+                   | name "=" expression
+expression ::= name | decimalinteger
+             | "True" | "False"
+             | "-" expression
+             | "not" expression
+             | expression "+" expression
+             | expression "and" expression
+             | expression "or" expression
+             | expression "=="
+             | expression "!="
+             | expression "if" expression "else" expression
+             | expression "is" expression
+             | "(" expression ")"
+             | "[" expr_list "]"
+             | "{" key_datum_list "}"
+             | subscription
+             | expression "[" expression "]"
+             | expression "(" expr_list ")"
+             | "eval" "(" "input" "(" ")" ")"
+             | "lambda" id_list ":" expression
+subscription ::= expression "[" expression "]"
+target ::= identifier | subscription
+key_datum ::= expression ":" expression
+key_datum_list ::= key_datum | key_datum "," key_datum_list
+expr_list ::= expression | expression "," expr_list
+id_list ::=identifier | identifier "," id_list
+compound_stmt ::= "def" identifier "(" id_list ")" ":" suite
+suite ::= "\n" INDENT statement+ DEDENT
+name ::= identifier
+decimalinteger ::= [0-9]+
+\end{lstlisting}
+\caption{P2 Grammar}
+\end{figure}
