@@ -1,10 +1,9 @@
 \FloatBarrier
 \section{Appendix: \ptwo{} Grammar} 
 \label{sec:grammar}
-\toolname operates on a subset of Python 3 named \ptwo{} as described in A Problem Course in Compilation: From Python to x86 Assembly~\cite{pythonbook}. \ptwo{} consists of integer and boolean values and variables, addition and subtraction, boolean operations, comparators, conditionals and ternaries, while loops, and function calls and definitions. The grammar of \ptwo{} is given in Figure~\ref{fig:grammar}.
+\toolname operates on a subset of Python 3 named \ptwo{} as described in ``A Problem Course in Compilation: From Python to x86 Assembly''~\cite{pythonbook}. \ptwo{} consists of integer and boolean values and variables, addition and subtraction, boolean operations, comparators, conditionals and ternaries, while loops, and function calls and definitions. The grammar of \ptwo{} is given below.
 
 \begin{figure}
-\label{fig:grammar}
 \begin{lstlisting}
 program ::= module
 module ::= statement+
@@ -32,7 +31,6 @@ expression ::= name | decimalinteger
              | expression "[" expression "]"
              | expression "(" expr_list ")"
              | "eval" "(" "input" "(" ")" ")"
-             | "lambda" id_list ":" expression
 subscription ::= expression "[" expression "]"
 target ::= identifier | subscription
 key_datum ::= expression ":" expression
@@ -44,5 +42,118 @@ suite ::= "\n" INDENT statement+ DEDENT
 name ::= identifier
 decimalinteger ::= [0-9]+
 \end{lstlisting}
+\label{fig:grammar}
 \caption{P2 Grammar}
+\end{figure}
+
+\newpage
+
+
+\section{Appendix: Abstractions found by \toolname} 
+The complete list of abstractions found by \toolname:
+
+\begin{figure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def swap_print(_param0, _param1,
+    _param2, _param3):
+    _param1 = _param3
+    _param0 = _param2
+    print(_param1)
+    print(_param0)
+    tmp = _param1
+    _param1 = _param0
+    _param0 = tmp
+    print(_param1)
+    return print(_param0)
+        \end{lstlisting}
+        % \caption{Function 1}
+        \label{fig:func1}
+    \end{subfigure}\hfill
+    %
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def assign_add(_param0, _param1,
+    _param2, _param3):
+    if int(_param3):
+        _param1 = _param1 + _param2
+    else:
+        _param1 = _param1 + _param0
+    return _param1
+        \end{lstlisting}
+        % \caption{Function 2}
+        \label{fig:func2}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Adjust vertical space between rows
+    
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def assign_print( _param0, _param1,
+    _param2,_param3):
+    _param1 = _param3
+    _param0 = _param2
+    return print(_param1 + _param0)
+        \end{lstlisting}
+        % \caption{Function 3}
+        \label{fig:func3}
+    \end{subfigure}\hfill
+    %
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def if_print(_param0, _param1,
+    _param2, _param3):
+    if _param3(_param2):
+        print(_param1)
+    else:
+        print(_param0)
+        \end{lstlisting}
+        % \caption{Function 4}
+        \label{fig:func4}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Adjust vertical space between rows
+    
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def multi_assign(_param1, _param2,
+    _param3):
+     x = 1
+     y = 2
+     z = _param3
+     _param2 = _param1
+     return (_param2, x, y, z)
+        \end{lstlisting}
+        % \caption{Function 5}
+        \label{fig:func5}
+    \end{subfigure}\hfill
+    %
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def multi_assign_2( _param1, _param2,
+    _param3, x):
+    y = _param3 + x
+    z = _param2 + y
+    w = _param1 + z
+    return (w, y, z)
+        \end{lstlisting}
+        % \caption{Function 6}
+        \label{fig:func6}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Adjust vertical space between rows
+    
+    \begin{subfigure}[t]{0.45\textwidth}
+        \begin{lstlisting}[language=Python, firstnumber=1]
+def assign_print_eq(_param0, _param1):
+    x = _param1
+    y = _param0
+    return print(x == y)
+        \end{lstlisting}
+        % \caption{Function 7}
+        \label{fig:func7}
+    \end{subfigure}
+    
+    \caption{Abstractions found by \toolname}
+    \label{fig:leroy-abstractions}
 \end{figure}
